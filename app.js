@@ -5,18 +5,15 @@ const width = 8
 const squares = []
 let score = 0
 
-
 const candyColors = [
-    'url(images/red-candy.png)',
-    'url(images/yellow-candy.png)',
-    'url(images/orange-candy.png)',
-    'url(images/purple-candy.png)',
-    'url(images/green-candy.png)',
-    'url(images/blue-candy.png)'
+    'url(alternative-images/alternative-red.png)',
+    'url(alternative-images/alternative-yellow.png)',
+    'url(alternative-images/alternative-orange.png)',
+    'url(alternative-images/alternative-purple.png)',
+    'url(alternative-images/alternative-green.png)',
+    'url(alternative-images/alternative-blue.png)'
   ]
 
-
-//create your board
 function createBoard() {
   for (let i = 0; i < width*width; i++) {
     const square = document.createElement('div')
@@ -30,7 +27,6 @@ function createBoard() {
 }
 createBoard()
 
-// Dragging the Candy
 let colorBeingDragged
 let colorBeingReplaced
 let squareIdBeingDragged
@@ -46,7 +42,6 @@ squares.forEach(square => square.addEventListener('drop', dragDrop))
 function dragStart(){
     colorBeingDragged = this.style.backgroundImage
     squareIdBeingDragged = parseInt(this.id)
-    // this.style.backgroundImage = ''
 }
 
 function dragOver(e) {
@@ -99,6 +94,47 @@ function moveIntoSquareBelow() {
 
 
 ///Checking for Matches
+
+//for row of Five
+function checkRowForFive() {
+  for (i = 0; i < 59; i ++) {
+    let rowOfFive = [i, i+1, i+2,i+3,i+4]
+    let decidedColor = squares[i].style.backgroundImage
+    const isBlank = squares[i].style.backgroundImage === ''
+
+    const notValid = [4, 5, 6, 7, 12, 13, 14, 15,20, 21, 22, 23, 28, 29, 30, 31, 36, 37, 38, 39, 44, 45, 46, 47, 52,53, 54, 55]
+    if (notValid.includes(i)) continue
+
+    if(rowOfFive.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
+      score += 5
+      scoreDisplay.innerHTML = score
+      rowOfFive.forEach(index => {
+      squares[index].style.backgroundImage = ''
+      })
+    }
+  }
+}
+checkRowForFive()
+
+//for column of Five
+function checkColumnForFive() {
+  for (i = 0; i < 47; i ++) {
+    let columnOfFive = [i, i+width, i+width*2, i+width*3, i+width*4]
+    let decidedColor = squares[i].style.backgroundImage
+    const isBlank = squares[i].style.backgroundImage === ''
+
+    if(columnOfFive.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
+      score += 5
+      scoreDisplay.innerHTML = score
+      columnOfFive.forEach(index => {
+      squares[index].style.backgroundImage = ''
+      })
+    }
+  }
+}
+checkColumnForFive()
+
+
 //for row of Four
   function checkRowForFour() {
     for (i = 0; i < 60; i ++) {
@@ -179,10 +215,16 @@ checkColumnForThree()
 
 // Checks carried out indefintely - Add Butotn to clear interval for best practise
 window.setInterval(function(){
+    checkRowForFive()
+    checkColumnForFive()
     checkRowForFour()
     checkColumnForFour()
     checkRowForThree()
     checkColumnForThree()
     moveIntoSquareBelow()
+    if(score>=10){
+      alert("You won");
+      score=0;
+    }
   }, 100);
 })
